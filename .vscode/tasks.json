@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Spring Boot Backend",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "backend/scripts/run-local.ps1"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Run React Frontend",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": [
+        "run",
+        "dev",
+        "--prefix",
+        "frontend"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Test Spring Boot Backend",
+      "type": "shell",
+      "command": "mvn.cmd",
+      "args": [
+        "-f",
+        "backend/pom.xml",
+        "test"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint React Frontend",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": [
+        "run",
+        "lint",
+        "--prefix",
+        "frontend"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Build React Frontend",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": [
+        "run",
+        "build",
+        "--prefix",
+        "frontend"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

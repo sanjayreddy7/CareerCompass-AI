@@ -1,0 +1,8 @@
+.empty-match-banner{display:flex;align-items:center;gap:12px;margin-bottom:17px;padding:12px 14px;background:#edf3ed;border:1px solid #e2ebe2;border-radius:4px;color:#526d59}
+.empty-match-banner>div{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;border-radius:50%;background:#e0ebe1;color:#567960}
+.empty-match-banner p{flex:1;margin:0;font-size:11px;line-height:1.5}
+.empty-match-banner .button{height:33px;flex:0 0 auto;font-size:10px}
+.modal-empty-match{margin:17px 0;padding:12px 13px;background:#edf3ed;border:1px solid #e2ebe2;border-radius:4px}
+.modal-empty-match p{margin:0;color:#617967;font-size:11px}
+.modal-empty-match .quiet-link{margin-top:5px}
+@media(max-width:760px){.empty-match-banner{align-items:flex-start;flex-wrap:wrap}.empty-match-banner p{flex-basis:calc(100% - 48px);align-self:center}.empty-match-banner .button{margin-left:43px}}

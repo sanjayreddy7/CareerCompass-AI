@@ -1,0 +1,9 @@
+.onboarding-form .auth-intro{margin-bottom:22px}
+.onboarding-skills{display:flex;flex-wrap:wrap;gap:8px}
+.onboarding-skill{min-height:35px;padding:0 11px;border:1px solid #deded5;border-radius:18px;background:#fff;color:#59655e;display:inline-flex;align-items:center;gap:5px;font:500 12px 'DM Sans',sans-serif;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.onboarding-skill:hover{border-color:#8ba397;color:#315e53}
+.onboarding-skill.selected{border-color:#b9cdbf;background:#eaf0ec;color:#315e53}
+.onboarding-resume{width:100%;display:flex;justify-content:center;align-items:center;gap:8px;margin-top:18px;padding:11px;border:0;background:transparent;color:#527768;font:600 12px 'DM Sans',sans-serif;cursor:pointer}
+.onboarding-resume:hover{color:#203d34}
+.auth-submit:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:760px){.onboarding-skills{gap:7px}.onboarding-skill{font-size:11px}}
