@@ -29,13 +29,28 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://career-compass-ahg3w7rcv-coders-85c1.vercel.app}") String allowedOrigins) {
+            @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://career-compass-ai-peach-theta.vercel.app,https://career-compass-ahg3w7rcv-coders-85c1.vercel.app}") String allowedOrigins) {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
         List<String> origins = new ArrayList<>();
-        // Explicitly ensure the deployed Vercel production origin is permitted
+        List<String> originPatterns = new ArrayList<>(List.of(
+                "https://*.vercel.app",
+                "https://career-compass-*.vercel.app",
+                "https://career-compass-ai-*.vercel.app",
+                "https://career-compass-*-coders-85c1.vercel.app",
+                "https://*.onrender.com",
+                "http://localhost:[*]",
+                "http://127.0.0.1:[*]"
+        ));
+
+        // Explicitly guarantee all known production origins
+        origins.add("https://career-compass-ai-peach-theta.vercel.app");
         origins.add("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app");
+        origins.add("http://localhost:5173");
+        origins.add("http://127.0.0.1:5173");
+        origins.add("http://localhost:3000");
+        origins.add("http://127.0.0.1:3000");
 
         // Parse any additional allowed origins from configuration or environment variable
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
@@ -43,18 +58,20 @@ public class SecurityConfig {
                     .map(String::trim)
                     .filter(origin -> !origin.isEmpty())
                     .forEach(origin -> {
-                        if (!origins.contains(origin)) {
-                            origins.add(origin);
+                        if (origin.contains("*")) {
+                            if (!originPatterns.contains(origin)) {
+                                originPatterns.add(origin);
+                            }
+                        } else {
+                            if (!origins.contains(origin)) {
+                                origins.add(origin);
+                            }
                         }
                     });
         }
 
         configuration.setAllowedOrigins(origins);
-
-        // Safely allow Vercel preview deployments for this project
-        configuration.setAllowedOriginPatterns(List.of(
-                "https://career-compass-*-coders-85c1.vercel.app"
-        ));
+        configuration.setAllowedOriginPatterns(originPatterns);
 
         configuration.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"

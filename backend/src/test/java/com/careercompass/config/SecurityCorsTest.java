@@ -29,9 +29,17 @@ class SecurityCorsTest {
         String allowedOrigin = corsConfig.checkOrigin("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app");
         assertEquals("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app", allowedOrigin);
 
+        // Test the new production Vercel origin
+        String newVercelOrigin = corsConfig.checkOrigin("https://career-compass-ai-peach-theta.vercel.app");
+        assertEquals("https://career-compass-ai-peach-theta.vercel.app", newVercelOrigin);
+
         // Test preview origin matching pattern
         String previewOrigin = corsConfig.checkOrigin("https://career-compass-preview123-coders-85c1.vercel.app");
         assertEquals("https://career-compass-preview123-coders-85c1.vercel.app", previewOrigin);
+
+        // Test any vercel.app deployment pattern
+        String anyVercelOrigin = corsConfig.checkOrigin("https://career-compass-feat-auth.vercel.app");
+        assertEquals("https://career-compass-feat-auth.vercel.app", anyVercelOrigin);
 
         // Test localhost
         String localhostOrigin = corsConfig.checkOrigin("http://localhost:5173");
@@ -45,9 +53,9 @@ class SecurityCorsTest {
 
         // Test non-api prefixed path /auth/register
         MockHttpServletRequest nonApiRequest = new MockHttpServletRequest("OPTIONS", "/auth/register");
-        nonApiRequest.addHeader("Origin", "https://career-compass-ahg3w7rcv-coders-85c1.vercel.app");
+        nonApiRequest.addHeader("Origin", "https://career-compass-ai-peach-theta.vercel.app");
         CorsConfiguration nonApiCors = source.getCorsConfiguration(nonApiRequest);
         assertNotNull(nonApiCors);
-        assertEquals("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app", nonApiCors.checkOrigin("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app"));
+        assertEquals("https://career-compass-ai-peach-theta.vercel.app", nonApiCors.checkOrigin("https://career-compass-ai-peach-theta.vercel.app"));
     }
 }
