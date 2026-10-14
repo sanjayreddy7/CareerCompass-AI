@@ -19,14 +19,18 @@ function resolveBaseUrl() {
   // Strip any accidental trailing slashes
   const cleanUrl = envUrl.replace(/\/+$/, '');
 
-  if (!cleanUrl) {
-    // In local development without VITE_API_URL, default to '/api'
-    // which Vite proxy forwards to http://localhost:8080
+  if (cleanUrl) {
+    return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+  }
+
+  // In development, default to '/api' which Vite dev/preview server proxies to http://localhost:8080
+  if (import.meta.env.DEV) {
     return '/api';
   }
 
-  // If already ending with '/api', use it as-is; otherwise append '/api'
-  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+  // In production (e.g. deployed to Vercel/Netlify without VITE_API_URL configured),
+  // fallback to the deployed Render backend so requests don't hit the static host with 404
+  return 'https://careercompass-ai-p8sc.onrender.com/api';
 }
 
 export const API_BASE_URL = resolveBaseUrl();
