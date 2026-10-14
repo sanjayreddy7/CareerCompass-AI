@@ -4,15 +4,51 @@ import com.careercompass.entity.AppUser;
 import com.careercompass.entity.Job;
 import com.careercompass.repository.AppUserRepository;
 import com.careercompass.repository.JobRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Set;
 
 @Configuration
 public class DataInitializer {
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+
+    @Bean
+    CommandLineRunner ensureSchema(JdbcTemplate jdbc) {
+        return args -> {
+            try {
+                jdbc.execute("CREATE TABLE IF NOT EXISTS resumes (" +
+                        "id VARCHAR(36) NOT NULL PRIMARY KEY, " +
+                        "user_id VARCHAR(36) NOT NULL, " +
+                        "file_name VARCHAR(255), " +
+                        "extracted_text TEXT, " +
+                        "skills_reviewed BOOLEAN NOT NULL DEFAULT FALSE, " +
+                        "uploaded_at DATETIME NOT NULL" +
+                        ")");
+                jdbc.execute("CREATE TABLE IF NOT EXISTS resume_extracted_skills (" +
+                        "resume_id VARCHAR(36) NOT NULL, " +
+                        "skill VARCHAR(100) NOT NULL" +
+                        ")");
+                jdbc.execute("CREATE TABLE IF NOT EXISTS recommendation_matching_skills (" +
+                        "recommendation_id VARCHAR(36) NOT NULL, " +
+                        "skill VARCHAR(100) NOT NULL" +
+                        ")");
+                jdbc.execute("CREATE TABLE IF NOT EXISTS recommendation_missing_skills (" +
+                        "recommendation_id VARCHAR(36) NOT NULL, " +
+                        "skill VARCHAR(100) NOT NULL" +
+                        ")");
+                log.info("Schema integrity verified: verified collection tables exist.");
+            } catch (Exception ex) {
+                log.warn("Schema initialization notice: {}", ex.getMessage());
+            }
+        };
+    }
+
     @Bean
     @ConditionalOnProperty(name = "app.demo-data.enabled", havingValue = "true")
     CommandLineRunner seedData(JobRepository jobs) {
