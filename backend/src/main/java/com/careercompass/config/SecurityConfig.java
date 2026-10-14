@@ -97,18 +97,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Permit preflight OPTIONS requests for all endpoints
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Public authentication endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Public authentication endpoints (support both /api/auth/** and /auth/**)
+                        .requestMatchers("/api/auth/**", "/auth/**").permitAll()
                         // Admin-only endpoints
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
                         // Saved jobs require authentication
-                        .requestMatchers("/api/jobs/saved").authenticated()
+                        .requestMatchers("/api/jobs/saved", "/jobs/saved").authenticated()
                         // Public job search & browsing
-                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/**", "/jobs", "/jobs/**").permitAll()
                         // Job mutations require ADMIN role
-                        .requestMatchers(HttpMethod.POST, "/api/jobs").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/jobs", "/jobs").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**", "/jobs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**", "/jobs/**").hasRole("ADMIN")
                         // All other API endpoints require authentication
                         .anyRequest().authenticated())
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

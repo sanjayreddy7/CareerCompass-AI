@@ -35,7 +35,7 @@ class AuthControllerTest {
 
         RequestMapping mapping = AuthController.class.getAnnotation(RequestMapping.class);
         assertNotNull(mapping);
-        assertArrayEquals(new String[]{"/api/auth"}, mapping.value());
+        assertArrayEquals(new String[]{"/api/auth", "/auth"}, mapping.value());
     }
 
     @Test

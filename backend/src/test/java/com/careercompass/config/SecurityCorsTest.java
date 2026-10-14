@@ -42,5 +42,12 @@ class SecurityCorsTest {
 
         // Verify headers
         assertTrue(corsConfig.getAllowedHeaders().containsAll(List.of("Authorization", "Content-Type")));
+
+        // Test non-api prefixed path /auth/register
+        MockHttpServletRequest nonApiRequest = new MockHttpServletRequest("OPTIONS", "/auth/register");
+        nonApiRequest.addHeader("Origin", "https://career-compass-ahg3w7rcv-coders-85c1.vercel.app");
+        CorsConfiguration nonApiCors = source.getCorsConfiguration(nonApiRequest);
+        assertNotNull(nonApiCors);
+        assertEquals("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app", nonApiCors.checkOrigin("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app"));
     }
 }
