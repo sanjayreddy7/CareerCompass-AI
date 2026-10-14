@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 @Service
 public class ResumeService {
     private static final Logger log = LoggerFactory.getLogger(ResumeService.class);
@@ -32,9 +29,6 @@ public class ResumeService {
     private final JobRepository jobs;
     private final RecommendationService ai;
     private final AppUserRepository users;
-
-    @Autowired(required = false)
-    private JdbcTemplate jdbc;
 
     public ResumeService(ResumeRepository resumes, JobRepository jobs, RecommendationService ai, AppUserRepository users) {
         this.resumes = resumes;
@@ -102,16 +96,6 @@ public class ResumeService {
                 .distinct()
                 .toList();
 
-        if (jdbc != null) {
-            try {
-                jdbc.execute("CREATE TABLE IF NOT EXISTS resume_extracted_skills (" +
-                        "resume_id VARCHAR(36) NOT NULL, " +
-                        "skill VARCHAR(100) NOT NULL" +
-                        ")");
-            } catch (Exception ddlEx) {
-                log.warn("Notice checking resume_extracted_skills schema: {}", ddlEx.getMessage());
-            }
-        }
 
         try {
             Resume resume = resumes.save(new Resume(user, filename, extractedText, extractedSkills));

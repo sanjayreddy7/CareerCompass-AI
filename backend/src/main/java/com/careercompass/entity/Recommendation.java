@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Convert;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.util.UUID;
@@ -27,13 +28,11 @@ public class Recommendation {
     private Job job;
     @Column(nullable = false)
     private Integer matchScore;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "recommendation_matching_skills", joinColumns = @JoinColumn(name = "recommendation_id"))
-    @Column(name = "skill", nullable = false, length = 100)
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = "TEXT")
     private List<String> matchingSkills;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "recommendation_missing_skills", joinColumns = @JoinColumn(name = "recommendation_id"))
-    @Column(name = "skill", nullable = false, length = 100)
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = "TEXT")
     private List<String> missingSkills;
     @Column(columnDefinition = "TEXT")
     private String explanation;

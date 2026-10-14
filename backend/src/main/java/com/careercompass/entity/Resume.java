@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Lob;
 import java.util.UUID;
 import java.time.LocalDateTime;
@@ -24,9 +25,8 @@ public class Resume {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String extractedText;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "resume_extracted_skills", joinColumns = @JoinColumn(name = "resume_id"))
-    @Column(name = "skill", nullable = false, length = 100)
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = "TEXT")
     private List<String> extractedSkills = new ArrayList<>();
     @Column(nullable = false)
     private boolean skillsReviewed;
