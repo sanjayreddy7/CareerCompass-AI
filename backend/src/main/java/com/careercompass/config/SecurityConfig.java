@@ -1,6 +1,7 @@
 package com.careercompass.config;
 
 import com.careercompass.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,33 +14,105 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-    @Bean PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
-    @Bean SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
-        return http.csrf(csrf -> csrf.disable()).cors(cors -> {}).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                    .requestMatchers("/api/jobs/saved").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/jobs").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
-    @Bean CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}") String allowedOrigins) {
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://career-compass-ahg3w7rcv-coders-85c1.vercel.app}") String allowedOrigins) {
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(origin -> !origin.isEmpty()).toList());
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        List<String> origins = new ArrayList<>();
+        // Explicitly ensure the deployed Vercel production origin is permitted
+        origins.add("https://career-compass-ahg3w7rcv-coders-85c1.vercel.app");
+
+        // Parse any additional allowed origins from configuration or environment variable
+        if (allowedOrigins != null && !allowedOrigins.isBlank()) {
+            Arrays.stream(allowedOrigins.split(","))
+                    .map(String::trim)
+                    .filter(origin -> !origin.isEmpty())
+                    .forEach(origin -> {
+                        if (!origins.contains(origin)) {
+                            origins.add(origin);
+                        }
+                    });
+        }
+
+        configuration.setAllowedOrigins(origins);
+
+        // Safely allow Vercel preview deployments for this project
+        configuration.setAllowedOriginPatterns(List.of(
+                "https://career-compass-*-coders-85c1.vercel.app"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+
+        configuration.setExposedHeaders(List.of(
+                "Authorization",
+                "Content-Type"
+        ));
+
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtFilter,
+            CorsConfigurationSource corsConfigurationSource) throws Exception {
+
+        return http
+                // CSRF disabled: Justified for stateless REST API using JWT Bearer tokens in Authorization headers without session cookies
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Permit preflight OPTIONS requests for all endpoints
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Public authentication endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Admin-only endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // Saved jobs require authentication
+                        .requestMatchers("/api/jobs/saved").authenticated()
+                        // Public job search & browsing
+                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/**").permitAll()
+                        // Job mutations require ADMIN role
+                        .requestMatchers(HttpMethod.POST, "/api/jobs").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("ADMIN")
+                        // All other API endpoints require authentication
+                        .anyRequest().authenticated())
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }
