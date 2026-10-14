@@ -6,8 +6,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn -DskipTests package
-
+git gi
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
