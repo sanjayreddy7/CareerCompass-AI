@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Lob;
 import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class Resume {
     @Column(nullable = false, length = 36)
     private String userId;
     private String fileName;
-    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String extractedText;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "resume_extracted_skills", joinColumns = @JoinColumn(name = "resume_id"))
