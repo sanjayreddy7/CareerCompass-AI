@@ -22,29 +22,33 @@ public class DataInitializer {
     CommandLineRunner ensureSchema(JdbcTemplate jdbc) {
         return args -> {
             try {
-                jdbc.execute("CREATE TABLE IF NOT EXISTS resumes (" +
-                        "id VARCHAR(36) NOT NULL PRIMARY KEY, " +
-                        "user_id VARCHAR(36) NOT NULL, " +
-                        "file_name VARCHAR(255), " +
-                        "extracted_text TEXT, " +
-                        "skills_reviewed BOOLEAN NOT NULL DEFAULT FALSE, " +
-                        "uploaded_at DATETIME NOT NULL" +
-                        ")");
                 jdbc.execute("CREATE TABLE IF NOT EXISTS resume_extracted_skills (" +
                         "resume_id VARCHAR(36) NOT NULL, " +
                         "skill VARCHAR(100) NOT NULL" +
                         ")");
+                log.info("Verified resume_extracted_skills table.");
+            } catch (Exception ex) {
+                log.warn("Notice checking resume_extracted_skills: {}", ex.getMessage());
+            }
+
+            try {
                 jdbc.execute("CREATE TABLE IF NOT EXISTS recommendation_matching_skills (" +
                         "recommendation_id VARCHAR(36) NOT NULL, " +
                         "skill VARCHAR(100) NOT NULL" +
                         ")");
+                log.info("Verified recommendation_matching_skills table.");
+            } catch (Exception ex) {
+                log.warn("Notice checking recommendation_matching_skills: {}", ex.getMessage());
+            }
+
+            try {
                 jdbc.execute("CREATE TABLE IF NOT EXISTS recommendation_missing_skills (" +
                         "recommendation_id VARCHAR(36) NOT NULL, " +
                         "skill VARCHAR(100) NOT NULL" +
                         ")");
-                log.info("Schema integrity verified: verified collection tables exist.");
+                log.info("Verified recommendation_missing_skills table.");
             } catch (Exception ex) {
-                log.warn("Schema initialization notice: {}", ex.getMessage());
+                log.warn("Notice checking recommendation_missing_skills: {}", ex.getMessage());
             }
         };
     }
