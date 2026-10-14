@@ -44,7 +44,7 @@ function Register() {
             <section className="auth-form-side">
                 <Link className="back-home" to="/"><ArrowLeft size={15} /> Back home</Link>
                 <div className="auth-form-wrap"><span className="eyebrow">CREATE YOUR PROFILE</span><h2>Find your next fit</h2><p className="auth-intro">A few details get your search moving.</p>
-                    <form onSubmit={submit}>
+                    <form onSubmit={submit} action="javascript:void(0);">
                         <label>Full name<span className="input-wrap"><UserRound size={17} /><input name="name" autoComplete="name" placeholder="Your name" value={values.name} onChange={update} required /></span></label>
                         <label>Email address<span className="input-wrap"><Mail size={17} /><input name="email" type="email" autoComplete="email" placeholder="you@example.com" value={values.email} onChange={update} required /></span></label>
                         <label>Password<span className="input-wrap"><LockKeyhole size={17} /><input name="password" type="password" minLength={8} autoComplete="new-password" placeholder="At least 8 characters" value={values.password} onChange={update} required /></span></label>

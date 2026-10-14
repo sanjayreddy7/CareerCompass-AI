@@ -97,8 +97,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Permit preflight OPTIONS requests for all endpoints
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Public authentication endpoints (support both /api/auth/** and /auth/**)
-                        .requestMatchers("/api/auth/**", "/auth/**").permitAll()
+                        // Public authentication endpoints (support /api/auth/**, /auth/**, /api/login, /login, /api/register, /register)
+                        .requestMatchers(
+                                "/api/auth/**", "/auth/**",
+                                "/api/login", "/login",
+                                "/api/register", "/register"
+                        ).permitAll()
                         // Admin-only endpoints
                         .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
                         // Saved jobs require authentication

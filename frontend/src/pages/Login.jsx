@@ -47,7 +47,7 @@ function Login() {
             <section className="auth-form-side">
                 <Link className="back-home" to="/"><ArrowLeft size={15} /> Back home</Link>
                 <div className="auth-form-wrap"><span className="eyebrow">WELCOME BACK</span><h2>Sign in to your account</h2><p className="auth-intro">Pick up where your next move begins.</p>
-                    <form onSubmit={submit}>
+                    <form onSubmit={submit} action="javascript:void(0);">
                         <label>Email address<span className="input-wrap"><Mail size={17} /><input name="email" type="email" autoComplete="email" placeholder="you@example.com" value={values.email} onChange={update} required /></span></label>
                         <label>Password<span className="input-wrap"><LockKeyhole size={17} /><input name="password" type="password" autoComplete="current-password" placeholder="Your password" value={values.password} onChange={update} required /></span></label>
                         {error && <p className="form-error" role="alert">{error}</p>}
