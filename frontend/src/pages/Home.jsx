@@ -7,6 +7,7 @@
   } from 'lucide-react'
   import { useLocation, useNavigate } from 'react-router-dom'
   import api, { errorMessage } from '../services/api'
+  import { useAuth } from '../context/AuthContext'
   import '../styles/EmptyMatch.css'
   import '../styles/Home.css'
 
@@ -49,6 +50,7 @@
   function Home() {
     const navigate = useNavigate()
     const location = useLocation()
+    const { logout: authLogout, updateUser } = useAuth()
     const [view, setView] = useState(location.state?.view || 'overview')
     const [profile, setProfile] = useState(demoProfile)
     const [jobs, setJobs] = useState(demoJobs)
@@ -83,7 +85,7 @@
           const nextProfile = profileResult.value.data
           setProfile(nextProfile)
           setProfileForm({ ...nextProfile, skills: (nextProfile.skills || []).join(', ') })
-          localStorage.setItem('user', JSON.stringify(nextProfile))
+          updateUser(nextProfile)
         } else {
           setDemoMode(true)
         }
@@ -97,7 +99,7 @@
       }
       load()
       return () => { active = false }
-    }, [])
+    }, [updateUser])
 
     const hasSkills = (profile.skills || []).some((skill) => skill.trim().length > 0)
     const scoredJobs = useMemo(() => {
@@ -121,8 +123,7 @@
     }
 
     function logout() {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      authLogout()
       navigate('/login')
     }
 
@@ -164,7 +165,7 @@
         const { data } = await api.put('/users/profile', payload)
         setProfile(data)
         setProfileForm({ ...data, skills: data.skills.join(', ') })
-        localStorage.setItem('user', JSON.stringify(data))
+        updateUser(data)
         try {
           const refreshed = await api.get('/recommendations?refresh=true')
           setRecommendations(refreshed.data)

@@ -1,27 +1,42 @@
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, LockKeyhole, Mail } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import api, { errorMessage } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import '../styles/Auth.css'
 
 function Login() {
     const navigate = useNavigate()
+    const location = useLocation()
+    const { login } = useAuth()
+    const from = location.state?.from?.pathname || '/dashboard'
+
     const [values, setValues] = useState({ email: '', password: '' })
     const [error, setError] = useState('')
     const [busy, setBusy] = useState(false)
-    function update(event) { setValues({ ...values, [event.target.name]: event.target.value }) }
+
+    function update(event) {
+        setValues({ ...values, [event.target.name]: event.target.value })
+    }
+
     async function submit(event) {
         event.preventDefault()
         setBusy(true)
         setError('')
         try {
             const { data } = await api.post('/auth/login', values)
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('user', JSON.stringify(data.user))
-            navigate('/dashboard', { replace: true })
-        } catch (requestError) { setError(errorMessage(requestError)) }
-        finally { setBusy(false) }
+            if (!data?.token) {
+                throw new Error('Authentication succeeded but no token was received from server.')
+            }
+            login(data.token, data.user)
+            navigate(from, { replace: true })
+        } catch (requestError) {
+            setError(errorMessage(requestError))
+        } finally {
+            setBusy(false)
+        }
     }
+
     return (
         <main className="auth-shell">
             <section className="auth-story">

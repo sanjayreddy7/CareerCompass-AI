@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Upload } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import api, { errorMessage } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import '../styles/Auth.css'
 import '../styles/Onboarding.css'
 
@@ -13,6 +14,7 @@ const skillOptions = [
 
 function Onboarding() {
     const navigate = useNavigate()
+    const { updateUser } = useAuth()
     const [profile, setProfile] = useState(null)
     const [selectedSkills, setSelectedSkills] = useState([])
     const [error, setError] = useState('')
@@ -51,7 +53,7 @@ function Onboarding() {
                 preferredRole: profile.preferredRole,
                 skills: selectedSkills,
             })
-            localStorage.setItem('user', JSON.stringify(data))
+            updateUser(data)
             navigate('/dashboard', { replace: true })
         } catch (requestError) {
             setError(errorMessage(requestError))

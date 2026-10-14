@@ -74,6 +74,7 @@ api.interceptors.response.use(
       if (!isAuthPage && typeof window !== 'undefined' && window.location.pathname.startsWith('/dashboard')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        window.dispatchEvent(new Event('auth-logout'));
         window.location.assign('/login');
       }
     }
